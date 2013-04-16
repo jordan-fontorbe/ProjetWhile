@@ -1,11 +1,13 @@
 %{
   #include<stdio.h>
-  int ligne = 1;
   int chr = 1;
+  extern int ligne;
+void yyerror(const char* msg);
+#include "syntsem.h"
 %}
 
 %option noyywrap
-type			"int"[[:blank:]]+|"decimal"[[:blank:]]+
+type			"int"[[:blank:]]*|"decimal"[[:blank:]]*
 retour 			"return"
 si			"if"
 alors			"then"
@@ -41,49 +43,43 @@ finLigne		\n
 virgule			","
 deuxpoints		":"
 %%
-{type}			{chr+=yyleng;}
-{retour}		{chr+=yyleng;}
-{si}			{chr+=yyleng;}
-{alors}			{chr+=yyleng;}
-{sinon}			{chr+=yyleng;}
-{tantQue}		{chr+=yyleng;}
-{faire}			{chr+=yyleng;}
-{fonction}		{chr+=yyleng;}
-{procedure}		{chr+=yyleng;}
-{est}			{chr+=yyleng;}
-{blockDebut}		{chr+=yyleng;}
-{blockFin}		{chr+=yyleng;}
-{affectation} 		{chr+=yyleng;}
-{entier}		{chr+=yyleng;}
-{decimal}		{chr+=yyleng;}
-{operateurUnaire}	{chr+=yyleng;}
-{operateurBinaire}	{chr+=yyleng;}
-{comparateur}		{chr+=yyleng;}
-{non}			{chr+=yyleng;}
-{et}			{chr+=yyleng;}
-{ou}			{chr+=yyleng;}
-{vrai}			{chr+=yyleng;}
-{faux}			{chr+=yyleng;}
-{parentheseOuvrante}	{chr+=yyleng;}
-{parentheseFermante}	{chr+=yyleng;}
-{programme}		{chr+=yyleng;}
-{allouer}		{chr+=yyleng;}
-{desallouer}		{chr+=yyleng;}
-{crochetOuvrant}	{chr+=yyleng;}
-{crochetFermant}	{chr+=yyleng;}
-{variable}		{chr+=yyleng;}
-{finInstruction}	{chr+=yyleng;}
+{type}			{chr+=yyleng; return(TYPE);}
+{retour}		{chr+=yyleng; return(RETOUR);}
+{si}			{chr+=yyleng; return(SI);}
+{alors}			{chr+=yyleng; return(ALORS);}
+{sinon}			{chr+=yyleng; return(SINON);}
+{tantQue}		{chr+=yyleng; return(TANTQUE);}
+{faire}			{chr+=yyleng; return(FAIRE);}
+{fonction}		{chr+=yyleng; return(FONCTION);}
+{procedure}		{chr+=yyleng; return(PROCEDURE);}
+{est}			{chr+=yyleng; return(EST);}
+{blockDebut}		{chr+=yyleng; return(BLOCKDEBUT);}
+{blockFin}		{chr+=yyleng; return(BLOCKFIN);}
+{affectation} 		{chr+=yyleng; return(AFFECTATION);}
+{entier}		{chr+=yyleng; return(ENTIER);}
+{decimal}		{chr+=yyleng; return(DECIMAL);}
+{operateurUnaire}	{chr+=yyleng; return(OPERATEURUNAIRE);}
+{operateurBinaire}	{chr+=yyleng; return(OPERATEURBINAIRE);}
+{comparateur}		{chr+=yyleng; return(COMPARATEUR);}
+{non}			{chr+=yyleng; return(NON);}
+{et}			{chr+=yyleng; return(ET);}
+{ou}			{chr+=yyleng; return(OU);}
+{vrai}			{chr+=yyleng; return(VRAI);}
+{faux}			{chr+=yyleng; return(FAUX);}
+{parentheseOuvrante}	{chr+=yyleng; return(PARENTHESEOUVRANTE);}
+{parentheseFermante}	{chr+=yyleng; return(PARENTHESEFERMANTE);}
+{programme}		{chr+=yyleng; return(PROGRAMME);}
+{allouer}		{chr+=yyleng; return(ALLOUER);}
+{desallouer}		{chr+=yyleng; return(DESALLOUER);}
+{crochetOuvrant}	{chr+=yyleng; return(CROCHETOUVRANT);}
+{crochetFermant}	{chr+=yyleng; return(CROCHETFERMANT);}
+{variable}		{chr+=yyleng; return(VARIABLE);}
+{finInstruction}	{chr+=yyleng; return(FININSTRUCTION);}
 {finLigne}		{chr=1; ligne++;}
-{virgule}		{chr+=yyleng;}
-{deuxpoints}	{chr+=yyleng;}
+{virgule}		{chr+=yyleng; return(VIRGULE);}
+{deuxpoints}		{chr+=yyleng; return(DEUXPOINTS);}
 [[:blank:]]+		{chr+=yyleng;}
 <<EOF>> 	      {printf("[Fichier analysée lexicalement]\n"); return 0;}
-.			{ printf("Erreur lexical : ligne %d caractère %d (caractère %c du mot %s)\n", ligne, chr, yytext[0], yytext); return 1;}
+.			{ char msg[150]; sprintf(msg,"Erreur lexical : ligne %d caractère %d (caractère %c du mot %s)\n", ligne, chr, yytext[0], yytext); yyerror(msg); return 1;}
 %%
-/** Code C **/
-int main(int argc, char** argv) {
-	if (argc > 1)yyin = fopen(argv[1], "r");
-	if (!yylex()) return printf("Programme ok lexicalement parlant ... :) \n");
-return 0;
-}
 
