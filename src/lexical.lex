@@ -39,6 +39,7 @@ variable		[a-z][a-zA-Z0-9]*
 finInstruction		";"
 finLigne		\n
 virgule			","
+deuxpoints		":"
 %%
 {type}			{chr+=yyleng;}
 {retour}		{chr+=yyleng;}
@@ -74,6 +75,7 @@ virgule			","
 {finInstruction}	{chr+=yyleng;}
 {finLigne}		{chr=1; ligne++;}
 {virgule}		{chr+=yyleng;}
+{deuxpoints}	{chr+=yyleng;}
 [[:blank:]]+		{chr+=yyleng;}
 <<EOF>> 	      {printf("[Fichier analysée lexicalement]\n"); return 0;}
 .			{ printf("Erreur lexical : ligne %d caractère %d (caractère %c du mot %s)\n", ligne, chr, yytext[0], yytext); return 1;}
