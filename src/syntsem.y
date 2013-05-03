@@ -2,7 +2,7 @@
 	#include <stdio.h>
 	int yylex(void);
 	void yyerror(const char* msg);
-	int ligne;
+	int ligne=1;
 	extern FILE* yyin;
 %}
 
@@ -17,13 +17,17 @@
 %token OPERATEURUNAIRE OPERATEURBINAIRE COMPARATEUR NON ET OU
 %token VRAI FAUX  PARENTHESEOUVRANTE PARENTHESEFERMANTE PROGRAMME
 %token ALLOUER DESALLOUER CROCHETOUVRANT CROCHETFERMANT VARIABLE
-%token FININSTRUCTION FINLIGNE VIRGULE DEUXPOINTS
+%token FININSTRUCTION VIRGULE DEUXPOINTS
 
 %type <intW> ENTIER
 %type <decimalW> DECIMAL
-%type <statementW> TYPE RETOUR SI ALORS SINON TANTQUE FAIRE FONCTION PROCEDURE EST BLOCKDEBUT BLOCKFIN AFFECTATION OPERATEURUNAIRE OPERATEURBINAIRE COMPARATEUR NON ET OU VRAI FAUX  PARENTHESEOUVRANTE PARENTHESEFERMANTE PROGRAMME ALLOUER DESALLOUER CROCHETOUVRANT CROCHETFERMANT VARIABLE FININSTRUCTION FINLIGNE VIRGULE DEUXPOINTS
+%type <statementW> TYPE RETOUR SI ALORS SINON TANTQUE FAIRE FONCTION PROCEDURE EST BLOCKDEBUT BLOCKFIN AFFECTATION OPERATEURUNAIRE OPERATEURBINAIRE COMPARATEUR NON ET OU VRAI FAUX  PARENTHESEOUVRANTE PARENTHESEFERMANTE PROGRAMME ALLOUER DESALLOUER CROCHETOUVRANT CROCHETFERMANT VARIABLE FININSTRUCTION VIRGULE DEUXPOINTS
 
 %type <statementW> lhs procedureCall functionCall variableList vdecl ifblock whileblock block statement	instruction statementList typeVariableList functionDeclaration	procedureDeclaration pdecl	program
+%left OPERATEURBINAIRE
+%right OPERATEURUNAIRE
+%left ET OU 
+%right NON
 %start program
 %%
 
@@ -49,7 +53,7 @@ booleanExpression		:	VRAI |
 							booleanExpression ET booleanExpression | 
 							booleanExpression OU booleanExpression | 
 							PARENTHESEOUVRANTE booleanExpression PARENTHESEFERMANTE;
-
+							
 arithmeticExpressionList :	arithmeticExpression | 
 							arithmeticExpression VIRGULE arithmeticExpressionList;
 
@@ -71,21 +75,22 @@ functionCall			:	lhs AFFECTATION VARIABLE PARENTHESEOUVRANTE PARENTHESEFERMANTE 
 variableList			:	lhs | 
 							lhs VIRGULE variableList;
 
+vdeclList 				: vdecl | vdecl vdeclList;
+
 vdecl					:	TYPE variableList FININSTRUCTION;
 
 ifblock					: 	SI booleanExpression ALORS statement SINON statement;
 
 whileblock				:	TANTQUE booleanExpression FAIRE statement;
 
-block					:	BLOCKDEBUT statementList BLOCKFIN | BLOCKDEBUT vdecl statementList BLOCKFIN;
+block					:	BLOCKDEBUT statementList BLOCKFIN | BLOCKDEBUT vdeclList statementList BLOCKFIN;
 
 statement				:	ifblock | 
 							whileblock | 
 							block | 
 							instruction FININSTRUCTION;
 
-statementList			:	statement | 
-							statement statementList;
+statementList			:	statement | statement statementList;
 
 typeVariableList		:	VARIABLE DEUXPOINTS TYPE | 
 							VARIABLE DEUXPOINTS TYPE VIRGULE typeVariableList;
@@ -97,18 +102,17 @@ procedureDeclaration	:	PROCEDURE VARIABLE PARENTHESEOUVRANTE PARENTHESEFERMANTE 
 							PROCEDURE VARIABLE PARENTHESEOUVRANTE typeVariableList PARENTHESEFERMANTE EST statement;
 
 pdecl					:	functionDeclaration | 
-							functionDeclaration | 
 							procedureDeclaration | 
 							procedureDeclaration pdecl ;
 
 
 %%
 void yyerror(const char* msg) {
-	fprintf(stderr, "Erreur syntaxique : ligne %d \n", ligne - 1);
+	fprintf(stderr, "Erreur syntaxique : ligne %d \n", ligne);
 }
 int main(int argc, char** argv) {
 	if (argc>1) yyin = fopen(argv[1],"r");
-	ligne = 0;
+	ligne = 1;
 	if (!yyparse()) return printf("Analyse syntaxique réussie sans encombres !!!\n");
 	return 1;
 }
