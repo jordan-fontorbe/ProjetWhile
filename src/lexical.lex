@@ -7,7 +7,7 @@ void yyerror(const char* msg);
 %}
 
 %option noyywrap
-type			"int"[[:blank:]]*|"decimal"[[:blank:]]*
+type			"integer"[[:blank:]]*|"decimal"[[:blank:]]*
 retour 			"return"
 si			"if"
 alors			"then"
@@ -32,7 +32,7 @@ vrai			"true"
 faux			"false"
 parentheseOuvrante	"("
 parentheseFermante	")"
-programme		"program"
+programme		"Program"
 allouer			"new"
 desallouer		"free"
 crochetOuvrant		"["

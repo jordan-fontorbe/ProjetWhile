@@ -1,0 +1,6 @@
+procedure test(x0:integer, x1:integer, x2:integer, x3:integer) is
+	 return
+Program
+begin
+test(0,1,2,3)	
+end

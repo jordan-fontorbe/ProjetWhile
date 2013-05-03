@@ -1,20 +1,21 @@
 procedure toto() is
 begin
-	int y;
+	integer y;
 	y := z;
 end
-function titi(a:decimal, intb:int) : int is
+function titi(a:decimal, intb:integer) : integer is
 begin
 	return 2;
 end
-program
+Program
 	begin
+		integer toto;
 		y := 18;
-		a := new int[3];
+		a := new integer[3];
 		free(a);
 	end
 	begin
-		int y;
+		integer y;
 		x:= 4 + 2.2 + a + 6;
 		f(x, 2.3, 8);
 		begin
