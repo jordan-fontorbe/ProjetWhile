@@ -22,8 +22,10 @@ blockFin		"end"
 affectation 		":="
 entier			[0-9]+
 decimal			[0-9]+(\.[0-9]+)?
-operateurUnaire		"-"
-operateurBinaire	"+"|"-"|"*"|"/"
+moins			"-"
+plus			"+"
+mul				"*"
+div				"/"
 comparateur		"<"|">"|"<="|">="|"="|"<>"
 non			"!"
 et			"&&"
@@ -53,14 +55,16 @@ deuxpoints		":"
 {fonction}		{chr+=yyleng; return(FONCTION);}
 {procedure}		{chr+=yyleng; return(PROCEDURE);}
 {est}			{chr+=yyleng; return(EST);}
-{blockDebut}		{chr+=yyleng; return(BLOCKDEBUT);}
+{blockDebut}	{chr+=yyleng; return(BLOCKDEBUT);}
 {blockFin}		{chr+=yyleng; return(BLOCKFIN);}
-{affectation} 		{chr+=yyleng; return(AFFECTATION);}
+{affectation} 	{chr+=yyleng; return(AFFECTATION);}
 {entier}		{chr+=yyleng; return(ENTIER);}
 {decimal}		{chr+=yyleng; return(DECIMAL);}
-{operateurUnaire}	{chr+=yyleng; return(OPERATEURUNAIRE);}
-{operateurBinaire}	{chr+=yyleng; return(OPERATEURBINAIRE);}
-{comparateur}		{chr+=yyleng; return(COMPARATEUR);}
+{moins}			{chr+=yyleng; return(MOINS);}
+{plus}			{chr+=yyleng; return(PLUS);}
+{mul}			{chr+=yyleng; return(MUL);}
+{div}			{chr+=yyleng; return(DIV);}
+{comparateur}	{chr+=yyleng; return(COMPARATEUR);}
 {non}			{chr+=yyleng; return(NON);}
 {et}			{chr+=yyleng; return(ET);}
 {ou}			{chr+=yyleng; return(OU);}
