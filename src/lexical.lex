@@ -56,7 +56,7 @@ deuxpoints		":"
 {procedure}		{chr+=yyleng; return(PROCEDURE);}
 {est}			{chr+=yyleng; return(EST);}
 {blockDebut}	{chr+=yyleng; return(BLOCKDEBUT);}
-{blockFin}		{chr+=yyleng; return(BLOCKFIN);}
+{blockFin}		{chr+=yyleng; yylval.statementW=yytext;return(BLOCKFIN);}
 {affectation} 	{chr+=yyleng; return(AFFECTATION);}
 {entier}		{chr+=yyleng; return(ENTIER);}
 {decimal}		{chr+=yyleng; return(DECIMAL);}
@@ -72,7 +72,7 @@ deuxpoints		":"
 {faux}			{chr+=yyleng; return(FAUX);}
 {parentheseOuvrante}	{chr+=yyleng; return(PARENTHESEOUVRANTE);}
 {parentheseFermante}	{chr+=yyleng; return(PARENTHESEFERMANTE);}
-{programme}		{chr+=yyleng; return(PROGRAMME);}
+{programme}		{chr+=yyleng; yylval.statementW=yytext; return(PROGRAMME);}
 {allouer}		{chr+=yyleng; return(ALLOUER);}
 {desallouer}		{chr+=yyleng; return(DESALLOUER);}
 {crochetOuvrant}	{chr+=yyleng; return(CROCHETOUVRANT);}

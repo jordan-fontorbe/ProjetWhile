@@ -32,7 +32,7 @@
 %start program
 %%
 
-program					:	PROGRAMME BLOCKFIN | 
+program					:	PROGRAMME BLOCKFIN {printf("%s\n",$$);}| 
 							pdecl PROGRAMME statementList BLOCKFIN | 
 							PROGRAMME statementList BLOCKFIN;
 
@@ -106,6 +106,7 @@ procedureDeclaration	:	PROCEDURE VARIABLE PARENTHESEOUVRANTE PARENTHESEFERMANTE 
 							PROCEDURE VARIABLE PARENTHESEOUVRANTE typeVariableList PARENTHESEFERMANTE EST statement;
 
 pdecl					:	functionDeclaration | 
+							functionDeclaration pdecl | 
 							procedureDeclaration | 
 							procedureDeclaration pdecl ;
 
