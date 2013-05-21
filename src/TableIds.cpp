@@ -1,5 +1,5 @@
 #include "TableIds.hpp"
-
+#include <iostream>
 using namespace std;
 
 TableIds::TableIds()
@@ -29,11 +29,20 @@ int TableIds::getId(std::string str)
   for (it = table.begin(); it != table.end(); it++)
     {
       if (str == it->second) 
-	{
-	  return it->first;
+      {
+		return it->first;
 	}
     }
   return -1;
+}
+
+int TableIds::potentialId(std::string str)
+{
+	int res = getId(str);
+	if (res == -1)
+		res = this->table.size();
+	
+	return res;
 }
 
 std::string TableIds::getNom(int id)
@@ -46,5 +55,5 @@ std::string TableIds::getNom(int id)
 	  return it->second;
 	}
     }
-  return NULL;
+  return "";
 }

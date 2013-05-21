@@ -11,6 +11,7 @@
 	#include <GeneratorDOTFile.hpp>
 	
 	using namespace std;
+	
 	int yylex(void);
 	void yyerror(const char* msg);
 	int ligne=1;
@@ -84,14 +85,16 @@ program					:	PROGRAMME BLOCKFIN { root = new NodeAST("Program"); } |
 							};
 
 lhs						:	VARIABLE { $$ = $1;} | 
-							VARIABLE CROCHETOUVRANT arithmeticExpression CROCHETFERMANT { $$ = -1; /* Pour l'instant on ne gère pas les tableaux */};
+							VARIABLE CROCHETOUVRANT arithmeticExpression CROCHETFERMANT { $$ = 0; /* Pour l'instant on ne gère pas les tableaux */};
 
 
 arithmeticExpression	:	lhs 
 							{ 
-								std::ostringstream oss;
-								oss << $1;
 								std::string nom = tableIdsCourante->getNom($1);
+								/* Marche pas, normalement gère le cas de variables non déclarées */
+								/* 
+								if (nom == "")
+									yyerror("Variable undefined\n"); */
 								$$ = new NodeAST(nom);
 								$$->addEntry($1);
 								$$->addType(tableSymbolesCourante->getType($1));
@@ -102,7 +105,7 @@ arithmeticExpression	:	lhs
 								std::ostringstream oss;
 								oss << $1;
 								$$ = new NodeAST(oss.str());
-								$$->addType("Integer");
+								$$->addType("integer");
 							}
 							| 
 							DECIMAL 
@@ -110,7 +113,7 @@ arithmeticExpression	:	lhs
 								std::ostringstream oss;
 								oss << $1;
 								$$ = new NodeAST(oss.str());
-								$$->addType("Decimal");
+								$$->addType("decimal");
 							} 
 							|
 							MOINS arithmeticExpression %prec NEG { $$ = 0; /* Non géré pour l'instant */} | 
@@ -227,10 +230,18 @@ instruction				:	RETOUR
 							| 
 							lhs AFFECTATION arithmeticExpression 
 							{
+								/* Marche pas (normalement gère le cas d'une variable non déclarée */
+								/* std::string nom = tableIdsCourante->getNom($1->Id);
+								cout << $1->Id << endl;
+								IdName aux = *$1;
+								if (nom == "")
+									yyerror("Variable undefined\n");
+								*/
 								$$ = new NodeAST(":=");
-								std::ostringstream oss;
-								oss << $1;
-								$$->addChild(new NodeAST(oss.str()));
+								std::string nom = tableIdsCourante->getNom($1);
+								NodeAST *nodeLHS = new NodeAST(nom);
+								nodeLHS->addEntry($1);
+								$$->addChild(nodeLHS);
 								$$->addChild($3);
 							}| 
 							lhs AFFECTATION ALLOUER TYPE CROCHETOUVRANT arithmeticExpression CROCHETFERMANT 
@@ -261,7 +272,7 @@ functionCall			:	lhs AFFECTATION VARIABLE PARENTHESEOUVRANTE PARENTHESEFERMANTE 
 
 
 variableList			:	lhs 
-							{ 
+							{
 								fileIdTemp.push($1);
 							} 
 							| 
@@ -276,7 +287,6 @@ vdecl					:	TYPE variableList FININSTRUCTION
 							{ 
 								while(!fileIdTemp.empty())
 								{
-									cout << $1 << endl;
 									tableSymbolesCourante->ajouterSymbole(fileIdTemp.front(), $1);
 									fileIdTemp.pop();
 								}
@@ -366,7 +376,7 @@ pdecl					:	functionDeclaration |
 
 %%
 void yyerror(const char* msg) {
-	fprintf(stderr, "Erreur syntaxique : ligne %d \n", ligne);
+	fprintf(stderr, "Error line %d : %s \n", ligne, msg);
 }
 int main(int argc, char** argv) {
 	if (argc>1) yyin = fopen(argv[1],"r");
@@ -383,7 +393,6 @@ int main(int argc, char** argv) {
 		{
 			printf("Root is NULL \n");
 		}
-		return printf("Analyse syntaxique réussie sans encombres !!!\n");
 	}
 	
 	return 1;

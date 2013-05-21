@@ -15,6 +15,7 @@ public:
 
   int ajouter(char* str);
   int getId(std::string str);
+  int potentialId(std::string);
   std::string getNom(int id);
   
 };
