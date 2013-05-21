@@ -31,7 +31,18 @@ string NodeAST::getLexem()
 
 string NodeAST::getInfo()
 {
-	return this->lexem;
+	string info = "lexem : " + this->lexem;
+	if (this->entry > -1)
+	{
+		ostringstream oss;
+		oss << this->entry;
+		info += "\\n entry : " + oss.str(); 
+	}
+	if (this->type.length() > 0)
+	{
+		info += "\\n type : " + this->type;
+	}
+	return info;
 }
 
 int NodeAST::getNbChildren()
@@ -42,6 +53,16 @@ int NodeAST::getNbChildren()
 NodeAST* NodeAST::getChild(int i)
 {
 	return this->children[i];
+}
+
+void NodeAST::addEntry(int e)
+{
+	this->entry = e;
+}
+
+void NodeAST::addType(string t)
+{
+	this->type = t;
 }
 
 string NodeAST::show()

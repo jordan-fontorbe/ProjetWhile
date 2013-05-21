@@ -4,6 +4,7 @@
 #include<string>
 #include<vector>
 #include<iostream>
+#include<sstream>
 
 
 class NodeAST
@@ -20,11 +21,15 @@ public:
   std::string show();
   int getNbChildren();
   NodeAST* getChild(int);
+  void addEntry(int);
+  void addType(std::string);
  
 private:
   
  std::vector<NodeAST*> children;
  std::string lexem;
+ int entry;
+ std::string type;
 };
 
 #endif //NODEAST_HPP
