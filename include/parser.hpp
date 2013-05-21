@@ -84,16 +84,21 @@ typedef union YYSTYPE
 {
 
 /* Line 2068 of yacc.c  */
-#line 12 "src/parser.y"
+#line 27 "src/parser.y"
 
 	int intW;
 	float decimalW;
+	char* stringW;
 	Operande *operandeW;
+	int idW;
+	char* typeW;
+	NodeAST *nodeW;
+	NodeASTList *nodeListW;
 
 
 
 /* Line 2068 of yacc.c  */
-#line 97 "src/parser.h"
+#line 102 "src/parser.h"
 } YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */

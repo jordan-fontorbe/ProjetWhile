@@ -1,0 +1,28 @@
+#ifndef TABLESYMBOLES_HPP
+#define TABLESYMBOLES_HPP
+
+#include <stack>
+#include <map>
+
+
+
+class TableSymboles
+{
+public:
+  enum Type
+    {
+      SYMBOLE_INTEGER,
+      SYMBOLE_DECIMAL
+    };
+  TableSymboles();
+  ~TableSymboles();
+  
+  void push(std::map<int, Type>);
+  void pop();
+  void ajouterSymbole(int, Type);
+
+private:
+  std::stack<std::map<int, Type> > table;
+};
+
+#endif //TABLESYMBOLES_HPP

@@ -1,0 +1,21 @@
+#ifndef NODEAST_HPP
+#define NODEAST_HPP
+
+#include<string>
+#include<vector>
+
+
+class NodeAST
+{
+public:
+  NodeAST(std::string);
+  ~NodeAST();
+
+  void addChild(NodeAST);
+
+private:
+  std::string lexem;
+  std::vector<NodeAST> children;
+};
+
+#endif //NODEAST_HPP

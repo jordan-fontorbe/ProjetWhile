@@ -1,8 +1,13 @@
 %{
 	#include<stdio.h>
 	#include <Operande.hpp>
+	#include <TableIds.hpp>
+	#include <NodeAST.hpp>
+	#include <NodeASTList.hpp>
+	#include <vector>
 	int chr = 1;
 	extern int ligne;
+	extern TableIds *tableIdsCourante;
 	void yyerror(const char* msg);
 	#include "parser.hpp"
 	
@@ -47,7 +52,7 @@ finLigne			\n
 virgule				","
 deuxpoints			":"
 %%
-{type}				{chr+=yyleng; return(TYPE);}
+{type}				{chr+=yyleng; yylval.typeW = yytext; return(TYPE);}
 {retour}			{chr+=yyleng; return(RETOUR);}
 {si}				{chr+=yyleng; return(SI);}
 {alors}				{chr+=yyleng; return(ALORS);}
@@ -66,7 +71,7 @@ deuxpoints			":"
 {plus}				{chr+=yyleng; return(PLUS);}
 {mul}				{chr+=yyleng; return(MUL);}
 {div}				{chr+=yyleng; return(DIV);}
-{comparateur}		{chr+=yyleng; return(COMPARATEUR);}
+{comparateur}		{chr+=yyleng; yylval.stringW = yytext; return(COMPARATEUR);}
 {non}				{chr+=yyleng; return(NON);}
 {et}				{chr+=yyleng; return(ET);}
 {ou}				{chr+=yyleng; return(OU);}
@@ -79,13 +84,13 @@ deuxpoints			":"
 {desallouer}		{chr+=yyleng; return(DESALLOUER);}
 {crochetOuvrant}	{chr+=yyleng; return(CROCHETOUVRANT);}
 {crochetFermant}	{chr+=yyleng; return(CROCHETFERMANT);}
-{variable}			{chr+=yyleng; /*Ajouter dans table des variable */ return(VARIABLE);}
+{variable}			{chr+=yyleng; yylval.idW = tableIdsCourante->ajouter(yytext); return(VARIABLE);}
 {finInstruction}	{chr+=yyleng; return(FININSTRUCTION);}
 {finLigne}			{chr=1; ligne++;}
 {virgule}			{chr+=yyleng; return(VIRGULE);}
 {deuxpoints}		{chr+=yyleng; return(DEUXPOINTS);}
 [[:blank:]]+		{chr+=yyleng;}
-<<EOF>> 	      	{printf("[Fichier analysée lexicalement]\n"); return 0;}
+<<EOF>> 	      	{return 0;}
 .					{ char msg[150]; sprintf(msg,"Erreur lexical : ligne %d caractère %d (caractère %c du mot %s)\n", ligne, chr, yytext[0], yytext); yyerror(msg); return 1;}
 %%
 
