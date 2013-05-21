@@ -27,5 +27,13 @@ void TableSymboles::ajouterSymbole(int id, string t)
 
 string TableSymboles::getType(int id)
 {
-	return table[id];
+	stack<map<int,string> > st(table);
+	while(!st.empty()) 
+	{
+		string s = st.top()[id];
+		if(s.length() > 0)
+			return s;
+		st.pop();
+	}
+	return "";
 }
