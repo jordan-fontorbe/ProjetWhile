@@ -91,7 +91,8 @@ arithmeticExpression	:	lhs
 							{ 
 								std::ostringstream oss;
 								oss << $1;
-								$$ = new NodeAST(oss.str());
+								std::string nom = tableIdsCourante->getNom($1);
+								$$ = new NodeAST(nom);
 							}
 							| 
 							ENTIER 
@@ -154,7 +155,29 @@ booleanExpression		:	VRAI
 							| 
 							arithmeticExpression COMPARATEUR arithmeticExpression
 							{
-								$$ = new NodeAST($2);
+								std::string s = $2;
+								if(s[0] == '>')
+								{
+									if(s[1] == '=')
+										$$ = new NodeAST(">=");
+									else
+										$$ = new NodeAST(">");
+								}
+								else if(s[0] == '<')
+								{
+									if(s[1] == '=')
+										$$ = new NodeAST("<=");
+									else 
+									{
+										if(s[1] == '>')
+											$$ = new NodeAST("<>");
+										else
+											$$ = new NodeAST("<");
+									}
+								}
+								else if(s[0] == '=')
+									$$ = new NodeAST("=");
+								
 								$$->addChild($1);
 								$$->addChild($3);
 							}

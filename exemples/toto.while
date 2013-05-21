@@ -6,8 +6,16 @@ begin
 		integer z;
 		integer a;
 		integer o;
+		if(x > y + 3) then
+		begin
 		x:=x+1;
 		y:= y-1;
+		end
+		else
+		begin
+		z:=18;
+		y:=z-x;
+		end
 		end
 end
 end

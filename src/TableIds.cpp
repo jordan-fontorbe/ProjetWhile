@@ -35,3 +35,16 @@ int TableIds::getId(std::string str)
     }
   return -1;
 }
+
+std::string TableIds::getNom(int id)
+{
+	std::map<int, std::string>::iterator it;
+	  for (it = table.begin(); it != table.end(); it++)
+    {
+      if (id == it->first) 
+	{
+	  return it->second;
+	}
+    }
+  return NULL;
+}
