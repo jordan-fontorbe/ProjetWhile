@@ -1,0 +1,24 @@
+\documentclass{report}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[francais]{babel}
+\usepackage{graphicx}
+
+\title{Rapport de projet : compilateur while}
+\author{Tom Besson, Jordan Fontorbe, Arthur Guillaume}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\paragraph{Etat du projet} Nous avons terminé l'analyseur lexical et syntaxique. L'analyse sémantique est incompléte, car elle ne fait pas de vérification 
+sémantique. Cependant, nous sommes parvenus à générer un arbre pouvant être affiché en format dot. De plus nous avons ajouter la table des symboles et des 
+identifiants pour les variables, pas pour les fonctions. Nous n'avons pas implémenté de solution pour gérer les instructions de retour absentes.
+
+\paragraph{Modification de la grammaire} Nous avons un peu modifié la grammaire, en ajoutant l'obligation de mettre un point-virgule à la fin de chaque 
+instructions, return compris. Il faut aussi ajouter un end à la fin du programme pour fermer le corps de la fonction. 
+\newline
+\begin{center}\includegraphics[width=10cm,height=10cm]{AST.png}\end{center}
+
+\end{document}
