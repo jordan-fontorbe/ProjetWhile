@@ -16,6 +16,7 @@ public:
   void push(std::map<int, std::string>);
   void pop();
   void ajouterSymbole(int, std::string);
+  std::string getType(int);
 
 private:
   std::stack<std::map<int, std::string> > table;

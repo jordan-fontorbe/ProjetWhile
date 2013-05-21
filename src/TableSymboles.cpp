@@ -24,3 +24,8 @@ void TableSymboles::ajouterSymbole(int id, string t)
 {
   table.top()[id] = t;
 }
+
+string TableSymboles::getType(int id)
+{
+	return table[id];
+}
