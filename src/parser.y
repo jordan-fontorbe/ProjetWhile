@@ -93,6 +93,8 @@ arithmeticExpression	:	lhs
 								oss << $1;
 								std::string nom = tableIdsCourante->getNom($1);
 								$$ = new NodeAST(nom);
+								$$->addEntry($1);
+								$$->addType(tableSymbolesCourante->getType($1));
 							}
 							| 
 							ENTIER 
@@ -100,6 +102,7 @@ arithmeticExpression	:	lhs
 								std::ostringstream oss;
 								oss << $1;
 								$$ = new NodeAST(oss.str());
+								$$->addType("Integer");
 							}
 							| 
 							DECIMAL 
@@ -107,6 +110,7 @@ arithmeticExpression	:	lhs
 								std::ostringstream oss;
 								oss << $1;
 								$$ = new NodeAST(oss.str());
+								$$->addType("Decimal");
 							} 
 							|
 							MOINS arithmeticExpression %prec NEG { $$ = 0; /* Non géré pour l'instant */} | 
@@ -145,7 +149,7 @@ arithmeticExpression	:	lhs
 
 booleanExpression		:	VRAI
 							{
-								$$ = new NodeAST("TRUE");
+								$$ = new NodeAST("TRUE");;
 							} 
 							| 
 							FAUX 
@@ -272,6 +276,7 @@ vdecl					:	TYPE variableList FININSTRUCTION
 							{ 
 								while(!fileIdTemp.empty())
 								{
+									cout << $1 << endl;
 									tableSymbolesCourante->ajouterSymbole(fileIdTemp.front(), $1);
 									fileIdTemp.pop();
 								}

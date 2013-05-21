@@ -5,6 +5,7 @@ using namespace std;
 NodeAST::NodeAST(string lexemName)
 {
   lexem = lexemName;
+  this->entry = -1;
 }
 
 NodeAST::NodeAST()
@@ -31,7 +32,7 @@ string NodeAST::getLexem()
 
 string NodeAST::getInfo()
 {
-	string info = "lexem : " + this->lexem;
+	string info = this->lexem;
 	if (this->entry > -1)
 	{
 		ostringstream oss;
