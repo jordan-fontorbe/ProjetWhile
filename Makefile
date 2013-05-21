@@ -12,7 +12,7 @@ DEP_DIR         = ./dept/
 BIN_DIR         = ./bin/
 
 # Nom de l'executable
-BIN             = ding
+BIN             = compiler
 
 # Libs
 LIB_DIR         = ./
@@ -96,40 +96,6 @@ $(DEP_DIR)%.d: $(SRC_DIR)%.cpp
 
 .PHONY: clean distclean
 
-
-run: $(BIN_DIR)/$(BIN)
-	$(BIN_DIR)/$(BIN)
-
-#Rangement des fichiers
-store:
-	mkdir -p $(INC_DIR)
-	mkdir -p $(SRC_DIR)
-	mkdir -p $(OBJ_DIR)
-	mkdir -p $(DEP_DIR)
-	mv -v *.hpp $(INC_DIR)
-	mv -v parser.h $(INC_DIR)
-	mv -v *.cpp $(SRC_DIR)
-	mv -v lexer.l $(SRC_DIR)
-	mv -v parser.y $(SRC_DIR)
-	mv -v *.o $(OBJ_DIR)
-	mv -v *.d $(DEP_DIR)
-
-
-gdb: $(BIN_DIR)/$(BIN)
-	gdb $(BIN_DIR)/$(BIN)
-
-valgrind: $(BIN_DIR)/$(BIN)
-	valgrind $(BIN_DIR)/$(BIN)
-
 clean:
 	rm -f $(OBJ_DIR)*.o $(SRC_DIR)*~ $(DEP_DIR)*.d *~ $(BIN_DIR)/$(BIN)
 	rm $(SRCS_Y:$(SRC_DIR)%.y=$(SRC_DIR)%.c) $(SRCS_L:$(SRC_DIR)%.l=$(SRC_DIR)%.c)
-
-distclean: clean
-	rm -f $(BIN_DIR)/$(BIN)
-
-tar: clean
-	tar -cvzf ../${shell basename `pwd`}.tgz ../${shell basename `pwd`}
-
-#Ne pas supprimer automatiquement les fichiers intermédiaires de bison, on le fait nous même
-.PRECIOUS: $(SRCS_Y:$(SRC_DIR)%.y=$(SRC_DIR)%.c) $(SRCS_L:$(SRC_DIR)%.l=$(SRC_DIR)%.c)

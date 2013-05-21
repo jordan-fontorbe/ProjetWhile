@@ -1,0 +1,10 @@
+Pour lancer la compilation faire :
+make clean
+make
+
+Pour lancer l'exécution : 
+exécuter le script exec_compil.sh avec comme paramètres le fichier 
+contenant le code à compiler et le nom du fichier image résultat de la 
+génération du .dot.
+Exemple :
+./exec_compil.sh exemples/toto.while resultat.ps
