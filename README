@@ -1,10 +1,38 @@
-Pour lancer la compilation faire :
-make clean
-make
+------------------------------------------------------------------------
+Auteurs : Tom Besson, Jordan Fontorbe, Arthur Guillaume
+------------------------------------------------------------------------
 
-Pour lancer l'exécution : 
-exécuter le script exec_compil.sh avec comme paramètres le fichier 
-contenant le code à compiler et le nom du fichier image résultat de la 
-génération du .dot.
+
+------------------------------------------------------------------------
+Compilation
+------------------------------------------------------------------------
+Dans un terminal à la racine du répertoire faire :
+ make clean
+ make
+ 
+L'exécutable (le compilateur) se trouve dans le répertoire "bin/" et se
+nomme "compiler"
+
+
+
+------------------------------------------------------------------------
+Execution
+------------------------------------------------------------------------
+Dans un terminal, lancer le script "exec_compil.sh" avec comme premier
+paramètre le fichier contenant le code à analyser et en second paramètre
+le nom du fichier PNG contenant l'AST généré à partir de AST.dot .
 Exemple :
-./exec_compil.sh exemples/toto.while resultat.ps
+	./exec_compil.sh exemples/toto.while resultat.png
+	
+Sinon pour seulement faire l'analyse dans un terminal exécuter "compiler"
+avec comme paramètre le fichier contenant le code à analyser
+Exemple :
+	./bin/compiler exemples/toto.while
+	
+	
+	
+
+------------------------------------------------------------------------
+Exemples
+------------------------------------------------------------------------
+Des exemples de code while sont présents dans le dossier "exemples"

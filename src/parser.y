@@ -1,7 +1,6 @@
 %{
 	#include <stdio.h>
 	#include <iostream>
-	#include <Operande.hpp>
 	#include <TableIds.hpp>
 	#include <TableSymboles.hpp>
 	#include <queue>
@@ -9,6 +8,7 @@
 	#include <NodeASTList.hpp>
 	#include <sstream>
 	#include <GeneratorDOTFile.hpp>
+	#include <cstring>
 	
 	using namespace std;
 	
@@ -16,6 +16,7 @@
 	void yyerror(const char* msg);
 	int ligne=1;
 	TableIds *tableIdsCourante = new TableIds();
+	TableIds *tableIds = new TableIds();
 	TableSymboles *tableSymbolesCourante = new TableSymboles();
 	std::queue<int> fileIdTemp;
 	std::vector<std::string> lstFils;
@@ -29,7 +30,6 @@
 	int intW;
 	float decimalW;
 	char* stringW;
-	Operande *operandeW;
 	int idW;
 	char* typeW;
 	NodeAST *nodeW;
@@ -59,15 +59,21 @@
 %left PLUS MOINS
 %right NEG
 %left ET OU 
-/* %right NON */
 %start program
 %%
 
-program					:	PROGRAMME BLOCKFIN { root = new NodeAST("Program"); } | 
+program					:	PROGRAMME BLOCKFIN 
+							{ 
+								// On crée un noeud seul ...
+								root = new NodeAST("Program"); 
+							} 
+							| 
 							pdecl PROGRAMME statementList BLOCKFIN 
 							{ 
+								// On ne met pas les déclaration dans l'arbre
 								root = new NodeAST("Program");
 								NodeASTList* lstFils = $3;
+								// on ajoute chaque fils a l'arbre
 								for (unsigned int i = 0; i < lstFils->size(); i++)
 								{
 									root->addChild(lstFils->get(i));
@@ -78,23 +84,27 @@ program					:	PROGRAMME BLOCKFIN { root = new NodeAST("Program"); } |
 							{
 								root = new NodeAST("Program");
 								NodeASTList* lstFils = $2;
+								// on ajoute chaque fils a l'arbre
 								for (unsigned int i = 0; i < lstFils->size(); i++)
 								{
 									root->addChild(lstFils->get(i));
 								}
 							};
 
-lhs						:	VARIABLE { $$ = $1;} | 
+lhs						:	VARIABLE 
+							{ 
+								$$ = $1;
+							} 
+							| 
 							VARIABLE CROCHETOUVRANT arithmeticExpression CROCHETFERMANT { $$ = 0; /* Pour l'instant on ne gère pas les tableaux */};
 
 
 arithmeticExpression	:	lhs 
 							{ 
-								std::string nom = tableIdsCourante->getNom($1);
-								/* Marche pas, normalement gère le cas de variables non déclarées */
-								/* 
+								// lhs c'est une feuille de l'arbre
+								std::string nom = tableIds->getNom($1);
 								if (nom == "")
-									yyerror("Variable undefined\n"); */
+									yyerror("Variable undefined\n");
 								$$ = new NodeAST(nom);
 								$$->addEntry($1);
 								$$->addType(tableSymbolesCourante->getType($1));
@@ -102,6 +112,7 @@ arithmeticExpression	:	lhs
 							| 
 							ENTIER 
 							{ 
+								// ENTIER c'est une feuille de l'arbre
 								std::ostringstream oss;
 								oss << $1;
 								$$ = new NodeAST(oss.str());
@@ -110,18 +121,23 @@ arithmeticExpression	:	lhs
 							| 
 							DECIMAL 
 							{
+								// DECIMAL c'est une feuille de l'arbre
 								std::ostringstream oss;
 								oss << $1;
 								$$ = new NodeAST(oss.str());
 								$$->addType("decimal");
 							} 
 							|
-							MOINS arithmeticExpression %prec NEG { $$ = 0; /* Non géré pour l'instant */} | 
+							MOINS arithmeticExpression %prec NEG { $$ = 0; /* Non géré pour l'instant */} 
+							| 
 							arithmeticExpression MUL arithmeticExpression 
 							{
 								$$ = new NodeAST("*");
 								$$->addChild($1);
 								$$->addChild($3);
+								// Si le type a droite n'est pas le meme qu'a gauche on envoie une erreur
+								if (!$$->checkType())
+									yyerror("Incompatibles types\n");
 							} 
 							| 
 							arithmeticExpression DIV arithmeticExpression 
@@ -129,6 +145,9 @@ arithmeticExpression	:	lhs
 								$$ = new NodeAST("/");
 								$$->addChild($1);
 								$$->addChild($3);
+								// Si le type a droite n'est pas le meme qu'a gauche on envoie une erreur
+								if (!$$->checkType())
+									yyerror("Incompatibles types\n");
 							}
 							| 
 							arithmeticExpression PLUS arithmeticExpression 
@@ -136,6 +155,9 @@ arithmeticExpression	:	lhs
 								$$ = new NodeAST("+");
 								$$->addChild($1);
 								$$->addChild($3);
+								// Si le type a droite n'est pas le meme qu'a gauche on envoie une erreur
+								if (!$$->checkType())
+									yyerror("Incompatibles types\n");
 							}
 							| 
 							arithmeticExpression MOINS arithmeticExpression 
@@ -143,6 +165,9 @@ arithmeticExpression	:	lhs
 								$$ = new NodeAST("-");
 								$$->addChild($1);
 								$$->addChild($3);
+								// Si le type a droite n'est pas le meme qu'a gauche on envoie une erreur
+								if (!$$->checkType())
+									yyerror("Incompatibles types\n");
 							}
 							| 
 							PARENTHESEOUVRANTE arithmeticExpression PARENTHESEFERMANTE 
@@ -152,7 +177,7 @@ arithmeticExpression	:	lhs
 
 booleanExpression		:	VRAI
 							{
-								$$ = new NodeAST("TRUE");;
+								$$ = new NodeAST("TRUE");
 							} 
 							| 
 							FAUX 
@@ -214,11 +239,13 @@ booleanExpression		:	VRAI
 								$$ = $2;
 							};
 							
-arithmeticExpressionList :	arithmeticExpression | 
+arithmeticExpressionList :	arithmeticExpression 
+							| 
 							arithmeticExpression VIRGULE arithmeticExpressionList;
 
-instruction				:	RETOUR 
+instruction				 :	RETOUR 
 							{ 
+								// C'est une feuille
 								$$ = new NodeAST("RETURN");
 							} 
 							| 
@@ -230,19 +257,22 @@ instruction				:	RETOUR
 							| 
 							lhs AFFECTATION arithmeticExpression 
 							{
-								/* Marche pas (normalement gère le cas d'une variable non déclarée */
-								/* std::string nom = tableIdsCourante->getNom($1->Id);
-								cout << $1->Id << endl;
-								IdName aux = *$1;
+								std::string nom = tableIds->getNom($1);
+								// l'Id n'est pas dans la table donc on envoie une erreur
 								if (nom == "")
 									yyerror("Variable undefined\n");
-								*/
+								
+								// Création du noeud
 								$$ = new NodeAST(":=");
-								std::string nom = tableIdsCourante->getNom($1);
 								NodeAST *nodeLHS = new NodeAST(nom);
 								nodeLHS->addEntry($1);
+								nodeLHS->addType(tableSymbolesCourante->getType($1));
 								$$->addChild(nodeLHS);
 								$$->addChild($3);
+								
+								// Types différents donc on renvoie une erreur
+								if (!$$->checkType())
+									yyerror("Incompatibles types\n");
 							}| 
 							lhs AFFECTATION ALLOUER TYPE CROCHETOUVRANT arithmeticExpression CROCHETFERMANT 
 							{
@@ -264,20 +294,26 @@ instruction				:	RETOUR
 								$$ = 0; /* Non géré pour l'instant */ 
 							};
 
-procedureCall			:	VARIABLE PARENTHESEOUVRANTE PARENTHESEFERMANTE | 
+procedureCall			:	VARIABLE PARENTHESEOUVRANTE PARENTHESEFERMANTE 
+							| 
 							VARIABLE PARENTHESEOUVRANTE arithmeticExpressionList PARENTHESEFERMANTE;
 
-functionCall			:	lhs AFFECTATION VARIABLE PARENTHESEOUVRANTE PARENTHESEFERMANTE | 
+functionCall			:	lhs AFFECTATION VARIABLE PARENTHESEOUVRANTE PARENTHESEFERMANTE 
+							| 
 							lhs AFFECTATION VARIABLE PARENTHESEOUVRANTE arithmeticExpressionList PARENTHESEFERMANTE;
 
 
 variableList			:	lhs 
 							{
+								// On stock temporairement les Id des déclarations de variables pour gérer
+								// les déclaration multiples sur une ligne (ex : "integer x, y, z;")
 								fileIdTemp.push($1);
 							} 
 							| 
 							lhs VIRGULE variableList 
 							{
+								// On stock temporairement les Id des déclarations de variables pour gérer
+								// les déclaration multiples sur une ligne (ex : "integer x, y, z;")
 								fileIdTemp.push($1);
 							};
 
@@ -285,15 +321,29 @@ vdeclList 				: 	vdecl | vdecl vdeclList;
 
 vdecl					:	TYPE variableList FININSTRUCTION
 							{ 
+								char* nom;
 								while(!fileIdTemp.empty())
 								{
-									tableSymbolesCourante->ajouterSymbole(fileIdTemp.front(), $1);
+									int i = fileIdTemp.front();
+									string aux = tableIdsCourante->getNom(i);
+									nom =(char *) malloc(aux.length());
+									strcpy(nom, aux.c_str());
+									
+									// Il y a une déclaration donc on ajoute cet identifiant à la table
+									tableIds->ajouter(nom);
+									
+									// On ajoute aussi le type à la table des symboles
+									tableSymbolesCourante->ajouterSymbole(i, $1);
+									
 									fileIdTemp.pop();
+									
 								}
+							
 							};
 
 ifblock					: 	SI booleanExpression ALORS statement SINON statement
 							{
+								//Création du noeud
 								$$ = new NodeAST("IF");
 								$$->addChild($2);
 								$$->addChild($4);
@@ -302,6 +352,7 @@ ifblock					: 	SI booleanExpression ALORS statement SINON statement
 
 whileblock				:	TANTQUE booleanExpression FAIRE statement
 							{
+								//Création du noeud
 								$$ = new NodeAST("WHILE");
 								$$->addChild($2);
 								$$->addChild($4);
@@ -309,39 +360,50 @@ whileblock				:	TANTQUE booleanExpression FAIRE statement
 
 blockDeb				: 	BLOCKDEBUT
 							{
+								// Nouveau block donc nouveau haut de pile
 								std::map<int, std::string> mTemp;
 								tableSymbolesCourante->push(mTemp);
 							}
 
 block					:	blockDeb statementList BLOCKFIN 
 							{
+								// Création du noeud
 								$$ = new NodeAST("block");
 								NodeASTList *lstTemp = $2;
 								for (unsigned int i = 0; i < lstTemp->size(); i++)
 								{
 									$$->addChild(lstTemp->get(i));
 								}
+								
+								// Fin du block donc on fait un pop sur la pile
 								tableSymbolesCourante->pop(); 
 							}
 							| 
 							blockDeb vdeclList statementList BLOCKFIN
 							{
+								// Création du noeud
 								$$ = new NodeAST("block");
 								NodeASTList *lstTemp = $3;
 								for (unsigned int i = 0; i < lstTemp->size(); i++)
 								{
 									$$->addChild(lstTemp->get(i));
 								}
+								
+								// Fin du block donc on fait un pop sur la pile
 								tableSymbolesCourante->pop();
 							};
 
-statement				:	ifblock { $$ = $1;}| 
-							whileblock { $$ = $1;}| 
-							block { $$ = $1; } | 
+statement				:	ifblock { $$ = $1;}
+							| 
+							whileblock { $$ = $1;}
+							| 
+							block { $$ = $1; } 
+							| 
 							instruction FININSTRUCTION { $$ = $1;};
 
 statementList			:	statement
 							{
+								// Création de la liste des noeuds
 								NodeASTList *lstTemp = new NodeASTList();
 								lstTemp->addNode($1);
 								$$ = lstTemp;
@@ -349,6 +411,7 @@ statementList			:	statement
 							|
 							statement statementList
 							{
+								// Création de la liste des noeuds, on récupère aussi les précédents ...
 								NodeASTList *lstTemp = new NodeASTList();
 								lstTemp->addNode($1);
 								NodeASTList *lstList = $2;
@@ -384,14 +447,11 @@ int main(int argc, char** argv) {
 	
 	if (!yyparse()) 
 	{
+		// Génération du DOT
 		if (root != NULL)
 		{
 			GeneratorDotFile *myDot = new GeneratorDotFile(root);
 			myDot->GenerateDotFile("AST.dot");
-		}
-		else
-		{
-			printf("Root is NULL \n");
 		}
 	}
 	

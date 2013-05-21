@@ -12,13 +12,71 @@
 \begin{document}
 \maketitle
 
-\paragraph{Etat du projet} Nous avons terminé l'analyseur lexical et syntaxique. L'analyse sémantique est incompléte, car elle ne fait pas de vérification 
-sémantique. Cependant, nous sommes parvenus à générer un arbre pouvant être affiché en format dot. De plus nous avons ajouter la table des symboles et des 
-identifiants pour les variables, pas pour les fonctions. Nous n'avons pas implémenté de solution pour gérer les instructions de retour absentes.
+\section*{Analyse lexicale et syntaxique}
 
-\paragraph{Modification de la grammaire} Nous avons un peu modifié la grammaire, en ajoutant l'obligation de mettre un point-virgule à la fin de chaque 
-instructions, return compris. Il faut aussi ajouter un end à la fin du programme pour fermer le corps de la fonction. 
-\newline
-\begin{center}\includegraphics[width=10cm,height=10cm]{AST.png}\end{center}
+L'analyse lexicale et syntaxique fonctionne, nous avons suivi les règles du sujet. Cependant nous y avons apporté quelques modifications sur la grammaire :
+\begin{itemize}
+	\item[$\bullet$] Chaque instructions doit se terminer par un ";" (même la dernière), y compris sur les \emph{return}.
+	\item[$\bullet$] A la fin du programme il faut ajouter un \emph{end} pour fermer le corps de la fonction.
+\end{itemize}
+
+
+Si il y a une erreur pendant l'analyse lexicale ou syntaxique, un message apparaît indiquant le numéro de la ligne et le type d'erreur (lexicale ou syntaxique).
+
+\section*{Analyse sémantique}
+
+L'analyse sémantique reste incomplète. Voici les points que nous avons traité :
+
+\begin{itemize}
+	\item[$\bullet$] Création d'une table d'identificateurs pour les variables.
+	\item[$\bullet$] Création d'une table de symboles pour les variables. Pour la gérer nous avons utilisé un pile de vecteurs. Chaque vecteur contenant un identifiant et un type associé. Lorsque que l'on démarre un \emph{begin} on ajoute une nouvelle couche sur la pile (qui contiendra les nouvelles déclarations si il y en a). Lorsqu'on ferme un \emph{begin}, un fait un pop sur la pile. Ainsi pour vérifier si une variable est accessible on cherche dans tous les niveaux de la pile.
+	\item[$\bullet$] Création d'un AST. Sur ce point nous remontons les différents types, nous pouvons ainsi vérifier la cohérence des types (A noter que les types doivent être identiques, c'est-à-dire que nous ne pouvons pas metre un integer dans une variable decimal par exemple).
+	\item[$\bullet$] Nous vérifions si les différentes variables déclarés sont accessible au moments où elles sont utilisées.
+\end{itemize}
+
+\newpage
+
+Nous avons donc réussi à générer un AST, et à produire un .dot (AST.dot créé à l'endroit de l'exécution du compilateur). Voici un exemple de code, et sa représentation sous forme d'AST : 
+
+\begin{verbatim}
+Program
+begin
+	integer x;
+	integer y;
+	x := 2;
+	y := 5;
+	if(x > y + 3) then
+		begin
+			x:=x+1;
+		end
+	else
+		begin
+			integer z;
+			z:=18;
+			y:=z-x;
+		end
+end
+end
+\end{verbatim}
+
+\begin{figure}[h!]
+	\begin{center}
+		\includegraphics[width=1\textwidth]{AST.png}
+		\caption{AST}
+	\end{center}
+\end{figure}
+
+
+Nous n'avons donc pas géré les procedures, les fonctions et les tableaux dans l'analyse sémantique.
+
+\newpage
+
+\section*{Génération peudo-code}
+
+Nous n'avons pas réussi cette étape.
+
+\section*{Problème instructions de retour absente}
+
+Ce point n'a pas été traité.
 
 \end{document}

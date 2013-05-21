@@ -66,6 +66,50 @@ void NodeAST::addType(string t)
 	this->type = t;
 }
 
+string NodeAST::getType()
+{
+	return this->type;
+}
+
+bool NodeAST::checkType()
+{
+	bool res = true;
+	if (this->getType() == "")
+	{
+		string tmpType = "";
+		for (int i = 0; i < this->getNbChildren(); i++)
+		{
+			NodeAST* fils = this->getChild(i);
+			if (fils->getType() == "")
+				res = fils->checkType();
+				
+			if (res == false)
+				break;
+				
+			if (tmpType == "")
+				tmpType = fils->getType();
+			else
+			{
+				if (tmpType != fils->getType())
+				{
+					res = false;
+					break;
+				}
+			}
+		}
+		if (res == true)
+		{
+			this->addType(tmpType);
+		}
+	}
+	else
+	{
+		res = true;
+	}
+	
+	return res;
+}
+
 string NodeAST::show()
 {
 	string res = this->lexem;
